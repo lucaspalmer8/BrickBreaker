@@ -36,123 +36,129 @@ public class Breakout extends JComponent {
 		IS_PAUSED = !IS_PAUSED;
 	}
 
+	public interface DrawableObject {
+		void draw(Graphics2D g2);
+	}
+
 	private class FrameDrawer implements Runnable {
+
+		@Override
 		public void run() {
 			while(true) {
 				repaint();
 				if (IS_PAUSED) {
 					try {
-                    	Thread.sleep(1000/40);
-                	} catch(InterruptedException ex) {
-                    	Thread.currentThread().interrupt();
-                	}
+						Thread.sleep(1000/40);
+					} catch(InterruptedException ex) {
+						Thread.currentThread().interrupt();
+					}
 					continue;
 				}
 				if(m_ball.getSpeed() > 0) {
-                    int x = m_ball.getX();
-                    int y = m_ball.getY();
-                    if (m_ball.getDirection().getX() > 0) {
-                        if (m_ball.getDirection().getY() > 0) {
+					int x = m_ball.getX();
+					int y = m_ball.getY();
+					if (m_ball.getDirection().getX() > 0) {
+						if (m_ball.getDirection().getY() > 0) {
 							for (int i = 0; i < 5; i++) {
-                            	if (m_brickList.isPointInBricks(x + 1, y + 1)) {
+								if (m_brickList.isPointInBricks(x + 1, y + 1)) {
 									break;
 								}
 								x++;
 								y++;
-                        	}
+							}
 						} else {
 							for (int i = 0; i < 5; i++) {
-                                if (m_brickList.isPointInBricks(x + 1, y - 1)) {
-                                    break;
-                                }
-                                x++;
-                                y--;
-                            }
+								if (m_brickList.isPointInBricks(x + 1, y - 1)) {
+									break;
+								}
+								x++;
+								y--;
+							}
 						}
-                    } else {
+					} else {
 						if (m_ball.getDirection().getY() > 0) {
-                            for (int i = 0; i < 5; i++) {
-                                if (m_brickList.isPointInBricks(x - 1, y + 1)) {
-                                    break;
-                                }
-                                x--;
-                                y++;
-                            }
-                        } else {
-                            for (int i = 0; i < 5; i++) {
-                                if (m_brickList.isPointInBricks(x - 1, y - 1)) {
-                                    break;
-                                }
-                                x--;
-                                y--;
-                            }
-                        }
-					}                    
+							for (int i = 0; i < 5; i++) {
+								if (m_brickList.isPointInBricks(x - 1, y + 1)) {
+									break;
+								}
+								x--;
+								y++;
+							}
+						} else {
+							for (int i = 0; i < 5; i++) {
+								if (m_brickList.isPointInBricks(x - 1, y - 1)) {
+									break;
+								}
+								x--;
+								y--;
+							}
+						}
+					}					 
 
 					if (x <= BALL_RADIUS || x >= getWidth() - BALL_RADIUS) {
-                        m_ball.reflectX();
-                    }
-                    if (y <= BALL_RADIUS) {
-                        m_ball.reflectY();
-                    }
+						m_ball.reflectX();
+					}
+					if (y <= BALL_RADIUS) {
+						m_ball.reflectY();
+					}
 					if (y >= getHeight() + BALL_RADIUS) {
 						m_ball.setSpeed(0);
 						LIVES--;
 					}
 
-                    m_ball.setX(x);
-                    m_ball.setY(y);
+					m_ball.setX(x);
+					m_ball.setY(y);
 				
 					hasItHitAnyBricks();
 					hasItHitThePaddle();
-                }
+				}
 
 				if (m_paddle.getDirection() != 0) {
 					m_paddle.setX(m_paddle.getDirection()*10 + m_paddle.getX());
 					if (m_paddle.getX1() < 0) {
-                		m_paddle.setX1(0);
-            		}
-            		if (m_paddle.getX2() > getWidth()) {
-                		m_paddle.setX2(getWidth());
-            		}			
+						m_paddle.setX1(0);
+					}
+					if (m_paddle.getX2() > getWidth()) {
+						m_paddle.setX2(getWidth());
+					}			
 				}
 
 				try {
-    				Thread.sleep(1000/40);             
+					Thread.sleep(1000/40);			   
 				} catch(InterruptedException ex) {
-    				Thread.currentThread().interrupt();
+					Thread.currentThread().interrupt();
 				}
 			}
 		}
 	}
 
 	public class Point {
-        private int m_x;
-        private int m_y;
+		private int m_x;
+		private int m_y;
 
-        public Point(int x, int y) {
-            m_x = x;
-            m_y = y;
-        }
+		public Point(int x, int y) {
+			m_x = x;
+			m_y = y;
+		}
 
-        public int getX() {
-            return m_x;
-        }
+		public int getX() {
+			return m_x;
+		}
 
-        public int getY() {
-            return m_y;
-        }
+		public int getY() {
+			return m_y;
+		}
 
-        public void setX(int x) {
-            m_x = x;
-        }
+		public void setX(int x) {
+			m_x = x;
+		}
 
-        public void setY(int y) {
-            m_y = y;
-        }
-    }
+		public void setY(int y) {
+			m_y = y;
+		}
+	}
 
-	public class Ball {
+	public class Ball implements DrawableObject {
 		private int m_x;
 		private int m_y;
 		private int m_speed;
@@ -211,14 +217,15 @@ public class Breakout extends JComponent {
 			m_direction.setY(-1 * m_direction.getY());
 		}
 
+		@Override
 		public void draw(Graphics2D g2) {
 			if (m_speed == 0) {
 				initializePosition();
-		 	}
+			}
 
 			g2.setColor(Color.RED);
-    		g2.fillOval(m_x - BALL_RADIUS, m_y - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2);
-        }
+			g2.fillOval(m_x - BALL_RADIUS, m_y - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2);
+		}
 	}
 
 	private Ball m_ball = new Ball();
@@ -227,7 +234,7 @@ public class Breakout extends JComponent {
 		return m_ball;
 	}
 
-	public class Paddle {
+	public class Paddle implements DrawableObject {
 		private int m_xPos;
 		private int m_direction;
 
@@ -280,11 +287,12 @@ public class Breakout extends JComponent {
 			return getY() + PADDLE_HEIGHT/2;
 		}
 
+		@Override
 		public void draw(Graphics2D g2) {
-            g2.setStroke(new BasicStroke(PADDLE_HEIGHT));
-            g2.setColor(Color.WHITE);
-            g2.drawLine(m_xPos, getHeight() - 15, m_xPos + PADDLE_LENGTH, getHeight() - 15);
-        }
+			g2.setStroke(new BasicStroke(PADDLE_HEIGHT));
+			g2.setColor(Color.WHITE);
+			g2.drawLine(m_xPos, getHeight() - 15, m_xPos + PADDLE_LENGTH, getHeight() - 15);
+		}
 
 
 	}
@@ -295,10 +303,10 @@ public class Breakout extends JComponent {
 		return m_paddle;
 	}
 
-	public class Brick {
+	public class Brick implements DrawableObject {
 		int m_x;
-        int m_y;
-        Color m_color;
+		int m_y;
+		Color m_color;
 
 		Brick(int x, int y, Color color) {
 			m_x = x;
@@ -340,69 +348,72 @@ public class Breakout extends JComponent {
 
 		public boolean isPointInBrickArea(int x, int y) {
 			int brickX = getX();
-            int brickY = getY();
+			int brickY = getY();
 
-            int ballX = m_ball.getX();
-            int ballY = m_ball.getY();
+			int ballX = m_ball.getX();
+			int ballY = m_ball.getY();
 
-            int brickX1 = getX1();
-            int brickX2 = getX2();
-            int brickY1 = getY1();
-            int brickY2 = getY2();
+			int brickX1 = getX1();
+			int brickX2 = getX2();
+			int brickY1 = getY1();
+			int brickY2 = getY2();
 	
 			if (brickX1 <= ballX && ballX <= brickX2) {//in the x range
-                if (brickY1 - 10 < ballY && ballY < brickY2 + 10) {
+				if (brickY1 - 10 < ballY && ballY < brickY2 + 10) {
 					return true;
-                }
-            } else if (brickY1 <= ballY && ballY <= brickY2) {//in the y range
-                if (brickX1 - 10 < ballX && ballX < brickX2 + 10) {
-                	return true;
 				}
-            } else {
-                if (ballX < brickX1 && ballY < brickY1) {//top left corner
-                    int distanceSquared = (ballX - brickX1)*(ballX - brickX1) + (ballY - brickY1)*(ballY - brickY1);
-                    if (distanceSquared < 100) {
+			} else if (brickY1 <= ballY && ballY <= brickY2) {//in the y range
+				if (brickX1 - 10 < ballX && ballX < brickX2 + 10) {
+					return true;
+				}
+			} else {
+				if (ballX < brickX1 && ballY < brickY1) {//top left corner
+					int distanceSquared = (ballX - brickX1)*(ballX - brickX1) + (ballY - brickY1)*(ballY - brickY1);
+					if (distanceSquared < 100) {
 						return true;
-                    }
-                } else if (ballX > brickX2 && ballY < brickY1) {//top right corner
+					}
+				} else if (ballX > brickX2 && ballY < brickY1) {//top right corner
 					int distanceSquared = (ballX - brickX2)*(ballX - brickX2) + (ballY - brickY1)*(ballY - brickY1);
-                    if (distanceSquared < 100) {
+					if (distanceSquared < 100) {
 						return true;
-                    }
-                } else if (ballX < brickX1 && ballY > brickY2) {//bottom left corner
-                    int distanceSquared = (ballX - brickX1)*(ballX - brickX1) + (ballY - brickY2)*(ballY - brickY2);
-                    if (distanceSquared < 100) {
-                        return true;
-                    }
-                } else if (ballX > brickX2 && ballY > brickY2) {//bottom right corner
-                    int distanceSquared = (ballX - brickX2)*(ballX - brickX2) + (ballY - brickY2)*(ballY - brickY2);
-                    if (distanceSquared < 100) {
-                        return true;
-                    }
-                }
-            }
+					}
+				} else if (ballX < brickX1 && ballY > brickY2) {//bottom left corner
+					int distanceSquared = (ballX - brickX1)*(ballX - brickX1) + (ballY - brickY2)*(ballY - brickY2);
+					if (distanceSquared < 100) {
+						return true;
+					}
+				} else if (ballX > brickX2 && ballY > brickY2) {//bottom right corner
+					int distanceSquared = (ballX - brickX2)*(ballX - brickX2) + (ballY - brickY2)*(ballY - brickY2);
+					if (distanceSquared < 100) {
+						return true;
+					}
+				}
+			}
 			return false;
 		}
 
+		@Override
 		public void draw(Graphics2D g2) {
 			g2.setStroke(new BasicStroke(BRICK_HEIGHT));
-            g2.setColor(m_color);
-            g2.drawLine(getX(), getY(), getX() + BRICK_WIDTH, getY());
+			g2.setColor(m_color);
+			g2.drawLine(getX(), getY(), getX() + BRICK_WIDTH, getY());
 		}
 	}
 
-	public class BrickList {
+	public class BrickList implements DrawableObject {
 		private ArrayList<Brick> m_brickList = new ArrayList<Brick>();
 
 		public BrickList() {
 			int startingX = 100;
-        	int startingY = 80;
-        	List<Color> colorList = Arrays.asList(Color.BLUE, Color.GREEN, Color.RED, Color.YELLOW, Color.ORANGE, Color.WHITE);
-        	for (int i = 0; i < 15; i++) {
-            	for (int j = 0; j < 6; j++) {
-                	m_brickList.add(new Brick(startingX + i * (BRICK_WIDTH + BRICK_HEIGHT + 1), startingY + j * (BRICK_HEIGHT + 1), colorList.get(j)));
-            	}
-        	}
+			int startingY = 80;
+			List<Color> colorList = Arrays.asList(Color.BLUE, Color.GREEN, Color.RED, 
+												Color.YELLOW, Color.ORANGE, Color.WHITE);
+			for (int i = 0; i < 15; i++) {
+				for (int j = 0; j < 6; j++) {
+					m_brickList.add(new Brick(startingX + i * (BRICK_WIDTH + BRICK_HEIGHT + 1), 
+										startingY + j * (BRICK_HEIGHT + 1), colorList.get(j)));
+				}
+			}
 		}
 
 		public int size() {
@@ -436,10 +447,11 @@ public class Breakout extends JComponent {
 			return false;
 		}
 
+		@Override
 		public void draw(Graphics2D g2) {
 			for (Brick brick : m_brickList) {
-            	brick.draw(g2);
-        	}
+				brick.draw(g2);
+			}
 		}
 	}
 
@@ -473,12 +485,12 @@ public class Breakout extends JComponent {
 					break;
 				}
 			} else if (brickY1 <= ballY && ballY <= brickY2) {//in the y range
-				if (ballX < brickX1 && brickX1 - ballX <= 10 || ballX > brickX2 && ballX - brickX2 <= 10) {  
-                    m_ball.reflectX();
+				if (ballX < brickX1 && brickX1 - ballX <= 10 || ballX > brickX2 && ballX - brickX2 <= 10) {	 
+					m_ball.reflectX();
 					m_brickList.remove(i);
 					break;
-                }
-            } else {
+				}
+			} else {
 				if (ballX < brickX1 && ballY < brickY1) {//top left corner
 					int distanceSquared = (ballX - brickX1)*(ballX - brickX1) + (ballY - brickY1)*(ballY - brickY1);
 					if (distanceSquared <= 100) {
@@ -493,36 +505,36 @@ public class Breakout extends JComponent {
 				} else if (ballX > brickX2 && ballY < brickY1) {//top right corner
 					int distanceSquared = (ballX - brickX2)*(ballX - brickX2) + (ballY - brickY1)*(ballY - brickY1);
 					if (distanceSquared <= 100) {
-                        if (ballX - brickX2 < brickY1 - ballY) {
-                            m_ball.reflectY();
-                        } else {
-                            m_ball.reflectX();
-                        }
+						if (ballX - brickX2 < brickY1 - ballY) {
+							m_ball.reflectY();
+						} else {
+							m_ball.reflectX();
+						}
 						m_brickList.remove(i);
 						break;
-                    }
+					}
 				} else if (ballX < brickX1 && ballY > brickY2) {//bottom left corner
-                    int distanceSquared = (ballX - brickX1)*(ballX - brickX1) + (ballY - brickY2)*(ballY - brickY2);
-                    if (distanceSquared <= 100) {
-                        if (brickX1 - ballX < ballY - brickY2) {
-                            m_ball.reflectY();
-                        } else {
-                            m_ball.reflectX();
-                        }
+					int distanceSquared = (ballX - brickX1)*(ballX - brickX1) + (ballY - brickY2)*(ballY - brickY2);
+					if (distanceSquared <= 100) {
+						if (brickX1 - ballX < ballY - brickY2) {
+							m_ball.reflectY();
+						} else {
+							m_ball.reflectX();
+						}
 						m_brickList.remove(i);
 						break;
-                    }
+					}
 				} else if (ballX > brickX2 && ballY > brickY2) {//bottom right corner
-                    int distanceSquared = (ballX - brickX2)*(ballX - brickX2) + (ballY - brickY2)*(ballY - brickY2);
-                    if (distanceSquared <= 100) {
-                        if (ballX - brickX2 < ballY - brickY2) {
-                            m_ball.reflectY();
-                        } else {
-                            m_ball.reflectX();
-                        }
+					int distanceSquared = (ballX - brickX2)*(ballX - brickX2) + (ballY - brickY2)*(ballY - brickY2);
+					if (distanceSquared <= 100) {
+						if (ballX - brickX2 < ballY - brickY2) {
+							m_ball.reflectY();
+						} else {
+							m_ball.reflectX();
+						}
 						m_brickList.remove(i);
 						break;
-                    }
+					}
 				}
 			}
 		}
@@ -542,10 +554,11 @@ public class Breakout extends JComponent {
 		}
 	}
 
+	@Override
 	public void paintComponent(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g; // cast to get 2D drawing methods
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,  // antialiasing look nicer
-        					RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,  // antialiasing look nicer
+							RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setColor(Color.BLACK);
 		g2.fill(new Rectangle2D.Double(0, 0, getWidth(), getHeight()));
 		g2.setColor(Color.WHITE);
