@@ -13,8 +13,7 @@ import java.lang.Math;
 
 public class HomeScreen extends JComponent {
 	
-	public HomeScreen() {
-	
+	public HomeScreen() {	
 	}
 
 	public void paintComponent(Graphics g) {
