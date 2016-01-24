@@ -19,7 +19,7 @@ public class HomeScreen extends JComponent {
 	public void paintComponent(Graphics g) {
 	Graphics2D g2 = (Graphics2D) g; // cast to get 2D drawing methods
 	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,  // antialiasing look nicer
-			    RenderingHints.VALUE_ANTIALIAS_ON);
+				RenderingHints.VALUE_ANTIALIAS_ON);
 	g2.setStroke(new BasicStroke(getHeight()));
 	g2.setColor(Color.BLACK);
 	g2.drawLine(0, getHeight()/2, getWidth(), getHeight()/2);

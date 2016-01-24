@@ -54,7 +54,7 @@ public class Breakout extends JComponent {
 					}
 					continue;
 				}
-				if(m_ball.getSpeed() > 0) {
+				if (m_ball.getSpeed() > 0) {
 					int x = m_ball.getX();
 					int y = m_ball.getY();
 					if (m_ball.getDirection().getX() > 0) {

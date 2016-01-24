@@ -24,36 +24,36 @@ public class Game {
 		m_frame.setSize(1000, 500);
 		m_frame.setContentPane(m_homeScreen);
 		m_frame.setVisible(true);
-    }
+	}
 
 	public static class GameKeyListener extends KeyAdapter {
 		
 		@Override
 		public void keyPressed(KeyEvent e) {
-	    	if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+			if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 				if (!m_gameStarted) {
 					return;
 				}
 				m_breakout.getPaddle().setDirection(1);
-	    	}
-	    	if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+			}
+			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
 				if (!m_gameStarted) {
-		    		return;
+					return;
 				}
 				m_breakout.getPaddle().setDirection(-1);
-	    	}
-	    	if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			}
+			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 				if (!m_gameStarted) {
 					m_gameStarted = true;
 					m_frame.setContentPane(m_breakout);
 					m_frame.getContentPane().revalidate();
-		    		return;
+					return;
 				}
 				if (m_breakout.getBall().getSpeed() == 0) {
-		    		m_breakout.getBall().setDirection(-1, -1);
-		    		m_breakout.getBall().setSpeed(10);
+					m_breakout.getBall().setDirection(-1, -1);
+					m_breakout.getBall().setSpeed(10);
 				}
-	    	}
+			}
 			if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 				if (m_gameStarted) {
 					m_breakout.pauseResume();
@@ -63,16 +63,16 @@ public class Game {
 
 		@Override
 		public void keyReleased(KeyEvent e) {
-	    	if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+			if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 				if (m_breakout.getPaddle().getDirection() > 0) {
 					m_breakout.getPaddle().setDirection(0);
 				}
-	    	}
-	    	if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+			}
+			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
 				if (m_breakout.getPaddle().getDirection() < 0) {
 					m_breakout.getPaddle().setDirection(0);
 				}
-	    	}
+			}
 		}
 
 		@Override
