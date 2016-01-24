@@ -33,6 +33,7 @@ public class Game {
 
 	public static class GameKeyListener extends KeyAdapter {
 		public void keyPressed(KeyEvent e) {
+				System.out.println("KEYPRESSED");
                 if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 					if (!m_gameStarted) {
 						return;
@@ -64,9 +65,15 @@ public class Game {
                         //new Thread(canvas.new BallDrawer()).start();
                     }
                 }
+				if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+					if (m_gameStarted) {
+						m_breakout.pauseResume();
+					}
+				}
             }
 
             public void keyReleased(KeyEvent e) {
+				System.out.println("Key released");
                 if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
     //                System.out.println("Right key typed");
                 }
@@ -74,5 +81,9 @@ public class Game {
       //              System.out.println("Left key typed");
                 }
             }
+
+			public void keyTyped(KeyEvent e) {
+				System.out.println("KeyTyped");
+			}
 	}
 }

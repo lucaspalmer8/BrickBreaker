@@ -12,20 +12,32 @@ import java.lang.Thread;
 import java.lang.Math;
 
 public class Breakout extends JComponent {
+	
 	public static int BRICK_HEIGHT = 20;
-
 	public static int BRICK_WIDTH = 30;
-
 	public static int BALL_RADIUS = 10;
+	public static boolean IS_PAUSED = false;
 
 	public Breakout() {
 		new Thread(new FrameDrawer()).start();
+	}
+
+	public void pauseResume() {
+		IS_PAUSED = !IS_PAUSED;
 	}
 
 	public class FrameDrawer implements Runnable {
 		public void run() {
 			while(true) {
 				repaint();
+				if (IS_PAUSED) {
+					try {
+                    	Thread.sleep(1000/40);
+                	} catch(InterruptedException ex) {
+                    	Thread.currentThread().interrupt();
+                	}
+					continue;
+				}
 				if(m_ball.getSpeed() > 0) {
                     int x = m_ball.getX();
                     int y = m_ball.getY();
@@ -33,7 +45,7 @@ public class Breakout extends JComponent {
                         if (m_ball.getDirection().getY() > 0) {
 							for (int i = 0; i < 5; i++) {
                             	if (m_brickList.isPointInBricks(x + 1, y + 1)) {
-						System.out.println("Break 1");
+			//System.out.println("Break 1");
 									break;
 								}
 								x++;
@@ -80,9 +92,7 @@ public class Breakout extends JComponent {
 
                     m_ball.setX(x);
                     m_ball.setY(y);
-				//	if (m_brickList.isPointInBricks(m_ball.getX(), m_ball.getY())) {
-				//		System.out.println("Ahhhhhhhhhhhhhhhh");
-				//	}
+				
 					hasItHitAnyBricks();
                 }
 				try {
@@ -486,58 +496,6 @@ public class Breakout extends JComponent {
                     }
 				}
 			}
-
-					 
-
-			/*boolean inHorizontalRange = brickY - BRICK_HEIGHT/2 - 20 < ballY && ballY < brickY + BRICK_HEIGHT/2 + 20;
-			boolean inVerticalRange = brickX - BRICK_HEIGHT/2 - 20 < ballX && ballX < brickX + BRICK_HEIGHT/2 + BRICK_WIDTH + 20;
-			
-			if (inHorizontalRange && inVerticalRange) {
-				if (brickX - BRICK_HEIGHT/2 < ballX && ballX < brickX + BRICK_HEIGHT/2 + BRICK_WIDTH) {
-					m_ball.reflectY();
-				} else if (brickY - BRICK_HEIGHT/2 < ballY && ballY < brickY + BRICK_HEIGHT/2) {
-					m_ball.reflectX();
-				} else {
-					//top left corner
-					if (ballY <= brickY - BRICK_HEIGHT/2 && ballX <= brickX - BRICK_HEIGHT/2) {
-						if (brickY - ballY < brickX - ballX) {
-							m_ball.reflectX();
-						} else {
-							m_ball.reflectY();
-						}
-					} else if (ballY <= brickY - BRICK_HEIGHT/2 && ballX >= brickX + BRICK_HEIGHT/2 + BRICK_WIDTH) { //top right corner
-						if (brickY - BRICK_HEIGHT/2 - ballY < ballX - brickX - BRICK_HEIGHT/2 - BRICK_WIDTH) {
-							m_ball.reflectX();
-						} else {
-							m_ball.reflectY();
-						}
-					} else if (ballY >= brickY + BRICK_HEIGHT/2 && ballX <= brickX - BRICK_HEIGHT/2) { //bottom left corner
-						if (ballY - brickY < brickX - ballX) {
-							m_ball.reflectX();
-						} else {
-							m_ball.reflectY();
-						}
-					} else if (ballY >= brickY + BRICK_HEIGHT/2 && ballX >= brickX + BRICK_HEIGHT/2 + BRICK_WIDTH) {
-						if (ballY - brickY < ballX - brickX - BRICK_WIDTH) {
-							m_ball.reflectX();
-						} else {
-							m_ball.reflectY();
-						}
-					}
-				}	
-				m_brickList.remove(i);
-				break;
-			}
-
-//			if (m_brickList.get(i).getX() < m_ball.getX() && m_ball.getX() < m_brickList.get(i).getX() + BRICK_WIDTH) {
-//				int yDistance = m_ball.getY() - m_brickList.get(i).getY();
-//				
-//				if (yDistance < 10 && -10 < yDistance) {
-//					m_ball.reflectY();
-//					brickIndex = i;
-//					break;
-//				}
-//			}*/
 		}
 	}
 
@@ -555,6 +513,11 @@ public class Breakout extends JComponent {
 		m_brickList.draw(g2);
 		m_paddle.draw(g2);
 		m_ball.draw(g2);
+
+		if (IS_PAUSED) {
+			g2.setColor(Color.WHITE);
+			g2.drawString("PAUSED", getWidth()/2, 2*getHeight()/3);
+		}
         //g2.drawLine(0, 0, getWidth(), getHeight());  // draw line 
         //g2.setColor(Color.RED);
         //g2.drawLine(getWidth(), 0, 0, getHeight());  

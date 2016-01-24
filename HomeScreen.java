@@ -27,15 +27,9 @@ public class HomeScreen extends JComponent {
 		g2.setColor(Color.WHITE);
 		g2.drawString("Breakout", 50, 50);
 		g2.drawString("Press Enter to start the game!", 50, 100);
-        /*for (Brick brick : m_brickList) {
-            brick.draw(g2);
-        }*/
-//        m_brickList.draw(g2);
-  //      m_paddle.draw(g2);
-    //    m_ball.draw(g2);
-        //g2.drawLine(0, 0, getWidth(), getHeight());  // draw line 
-        //g2.setColor(Color.RED);
-        //g2.drawLine(getWidth(), 0, 0, getHeight());  
-    }
-
+		g2.drawString("Instructions:", 50, 120);
+		g2.drawString("Press the left/right arrow keys to move the paddle.", 50, 140);
+		g2.drawString("Press the Space Bar to pause the game.", 50, 160);
+		g2.drawString("Press Enter to start the ball moving.", 50, 180);
+	}
 }
