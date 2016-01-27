@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -13,8 +14,7 @@ import java.lang.Math;
 
 public class HomeScreen extends JComponent {
 	
-	public HomeScreen() {	
-	}
+	public HomeScreen() {}
 
 	public void paintComponent(Graphics g) {
 	Graphics2D g2 = (Graphics2D) g; // cast to get 2D drawing methods
