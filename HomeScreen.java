@@ -24,6 +24,7 @@ public class HomeScreen extends JComponent {
 	g2.setColor(Color.BLACK);
 	g2.drawLine(0, getHeight()/2, getWidth(), getHeight()/2);
 		g2.setColor(Color.WHITE);
+		g2.drawString("Hello\nHello\n", 50, 20);
 		g2.drawString("Breakout", 50, 50);
 		g2.drawString("Press Enter to start the game!", 50, 100);
 		g2.drawString("Instructions:", 50, 120);

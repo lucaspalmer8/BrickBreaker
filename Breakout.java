@@ -24,7 +24,7 @@ public class Breakout extends JComponent {
 	private static int BRICK_HEIGHT = 20;
 	private static int BRICK_WIDTH = 50;
 	private static int BRICK_GAP = 2;
-	private static int BALL_RADIUS = 5;
+	private static int BALL_RADIUS = 7;
 	private static int PADDLE_LENGTH = 50;
 	private static int PADDLE_HEIGHT = 10;
 
@@ -390,10 +390,6 @@ public class Breakout extends JComponent {
 		}
 
 		public boolean isPointInBrickArea(int x, int y) {
-			//fix scalign here if in use...............
-
-			int brickX = (int)getX();
-			int brickY = (int)getY();
 
 			int ballX = m_ball.getX();
 			int ballY = m_ball.getY();
@@ -404,32 +400,32 @@ public class Breakout extends JComponent {
 			int brickY2 = (int)getY2();
 	
 			if (brickX1 <= ballX && ballX <= brickX2) {//in the x range
-				if (brickY1 - 10 < ballY && ballY < brickY2 + 10) {
+				if (brickY1 - BALL_RADIUS < ballY && ballY < brickY2 + BALL_RADIUS) {
 					return true;
 				}
 			} else if (brickY1 <= ballY && ballY <= brickY2) {//in the y range
-				if (brickX1 - 10 < ballX && ballX < brickX2 + 10) {
+				if (brickX1 - BALL_RADIUS < ballX && ballX < brickX2 + BALL_RADIUS) {
 					return true;
 				}
 			} else {
 				if (ballX < brickX1 && ballY < brickY1) {//top left corner
 					int distanceSquared = (ballX - brickX1)*(ballX - brickX1) + (ballY - brickY1)*(ballY - brickY1);
-					if (distanceSquared < 100) {
+					if (distanceSquared < BALL_RADIUS*BALL_RADIUS) {
 						return true;
 					}
 				} else if (ballX > brickX2 && ballY < brickY1) {//top right corner
 					int distanceSquared = (ballX - brickX2)*(ballX - brickX2) + (ballY - brickY1)*(ballY - brickY1);
-					if (distanceSquared < 100) {
+					if (distanceSquared < BALL_RADIUS*BALL_RADIUS) {
 						return true;
 					}
 				} else if (ballX < brickX1 && ballY > brickY2) {//bottom left corner
 					int distanceSquared = (ballX - brickX1)*(ballX - brickX1) + (ballY - brickY2)*(ballY - brickY2);
-					if (distanceSquared < 100) {
+					if (distanceSquared < BALL_RADIUS*BALL_RADIUS) {
 						return true;
 					}
 				} else if (ballX > brickX2 && ballY > brickY2) {//bottom right corner
 					int distanceSquared = (ballX - brickX2)*(ballX - brickX2) + (ballY - brickY2)*(ballY - brickY2);
-					if (distanceSquared < 100) {
+					if (distanceSquared < BALL_RADIUS*BALL_RADIUS) {
 						return true;
 					}
 				}
@@ -440,12 +436,7 @@ public class Breakout extends JComponent {
 		@Override
 		public void draw(Graphics2D g2) {
 			g2.setColor(m_color);
-	        g2.fill(new Rectangle2D.Double(getX(), getY(), BRICK_WIDTH*getWidth()/X - BRICK_GAP, BRICK_HEIGHT*getHeight()/Y - BRICK_GAP));
-
-			//g2.setStroke(new BasicStroke(BRICK_HEIGHT*getHeight()/Y));
-			//g2.setColor(m_color);
-			//g2.drawLine((int)getX(), (int)getY(), 
-				//(int)(getX() + BRICK_WIDTH*getWidth()/X + BRICK_HEIGHT*(getWidth()/X - getHeight()/Y)), (int)getY());
+			g2.fill(new Rectangle2D.Double(getX(), getY(), BRICK_WIDTH*getWidth()/X - BRICK_GAP, BRICK_HEIGHT*getHeight()/Y - BRICK_GAP));
 		}
 	}
 
@@ -459,8 +450,7 @@ public class Breakout extends JComponent {
 												Color.YELLOW, Color.ORANGE, Color.WHITE);
 			for (int i = 0; i < 15; i++) {
 				for (int j = 0; j < 6; j++) {
-					m_brickList.add(new Brick(startingX + i*BRICK_WIDTH, 
-										startingY + j*BRICK_HEIGHT, colorList.get(j)));
+					m_brickList.add(new Brick(startingX + i*BRICK_WIDTH, startingY + j*BRICK_HEIGHT, colorList.get(j)));
 				}
 			}
 		}
@@ -554,16 +544,13 @@ public class Breakout extends JComponent {
 				continue;
 			}
 
-            int brickX = (int)brick.getX();
-            int brickY = (int)brick.getY();
+			int ballX = m_ball.getX();
+			int ballY = m_ball.getY();
 
-            int ballX = m_ball.getX();
-            int ballY = m_ball.getY();
-
-            int brickX1 = (int)brick.getX1();
-            int brickX2 = (int)brick.getX2();
-            int brickY1 = (int)brick.getY1();
-            int brickY2 = (int)brick.getY2();
+			int brickX1 = (int)brick.getX1();
+			int brickX2 = (int)brick.getX2();
+			int brickY1 = (int)brick.getY1();
+			int brickY2 = (int)brick.getY2();
 
 			Point direction = m_ball.getDirection();
 
@@ -581,27 +568,27 @@ public class Breakout extends JComponent {
 				if (distanceSquared <= BALL_RADIUS*BALL_RADIUS) {
 					if (direction.getX() < 0 && direction.getY() > 0) {
 						m_ball.reflectXY();
-                        m_brickList.remove(i);
-                        break;
-                    }
+						m_brickList.remove(i);
+						break;
+					}
 				}
 			} else if (ballX < brickX1 && ballY > brickY2) {//bottom left corner
 				int distanceSquared = (ballX - brickX1)*(ballX - brickX1) + (ballY - brickY2)*(ballY - brickY2);
 				if (distanceSquared <= BALL_RADIUS*BALL_RADIUS) {
 					if (direction.getX() > 0 && direction.getY() < 0) {
-                        m_ball.reflectXY();
-                        m_brickList.remove(i);
-                        break;
-                    }
+						m_ball.reflectXY();
+						m_brickList.remove(i);
+						break;
+					}
 				}
 			} else if (ballX > brickX2 && ballY > brickY2) {//bottom right corner
 				int distanceSquared = (ballX - brickX2)*(ballX - brickX2) + (ballY - brickY2)*(ballY - brickY2);
 				if (distanceSquared <= BALL_RADIUS*BALL_RADIUS) {
 					if (direction.getX() < 0 && direction.getY() < 0) {
-                        m_ball.reflectXY();
-                        m_brickList.remove(i);
-                        break;
-                    }
+						m_ball.reflectXY();
+						m_brickList.remove(i);
+						break;
+					}
 				}
 			}	
 		}
@@ -636,18 +623,18 @@ public class Breakout extends JComponent {
 		} else {
 			if (ballX < x1 && ballY < y1) { //top left corner
 				int distanceSquared = (ballX - x1)*(ballX - x1) + (ballY - y1)*(ballY - y1);
-                if (distanceSquared <= BALL_RADIUS*BALL_RADIUS) {
-                    if (direction.getX() > 0 && direction.getY() > 0) {
-                        m_ball.reflectXY();
-                    }
-                }
+				if (distanceSquared <= BALL_RADIUS*BALL_RADIUS) {
+					if (direction.getX() > 0 && direction.getY() > 0) {
+						m_ball.reflectXY();
+					}
+				}
 			} else if (ballX > x2 && ballY < y1) { //top right corner
 				int distanceSquared = (ballX - x2)*(ballX - x2) + (ballY - y1)*(ballY - y1);
-                if (distanceSquared <= BALL_RADIUS*BALL_RADIUS) {
-                    if (direction.getX() < 0 && direction.getY() > 0) {
-                        m_ball.reflectXY();
-                    }
-                } 
+				if (distanceSquared <= BALL_RADIUS*BALL_RADIUS) {
+					if (direction.getX() < 0 && direction.getY() > 0) {
+						m_ball.reflectXY();
+					}
+				} 
 			}
 		}
 	}
@@ -678,7 +665,7 @@ public class Breakout extends JComponent {
 		if (m_gameState == GameState.GAME_PAUSED) {
 			g2.setColor(Color.WHITE);
 			String paused = "PAUSED";
-        	int width = g2.getFontMetrics().stringWidth(paused);
+			int width = g2.getFontMetrics().stringWidth(paused);
 			g2.drawString(paused, getWidth()/2 - width/2, 2*getHeight()/3);
 		}
 
