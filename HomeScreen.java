@@ -32,5 +32,6 @@ public class HomeScreen extends JComponent {
 		g2.drawString("Press the left/right arrow keys to move the paddle.", 50, 180);
 		g2.drawString("Press the Space Bar to pause the game.", 50, 210);
 		g2.drawString("Press Enter to start the ball moving.", 50, 240);
+		g2.drawString("Hit the bricks with a circle to get an extra ball.", 50, 270);
 	}
 }

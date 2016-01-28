@@ -58,10 +58,12 @@ public class Game {
 				}
 				if (m_breakout.getGameState() == Breakout.GameState.GAME_OVER) {
 					m_breakout.startNewGame();
-				} else if (m_breakout.getBall().getSpeed() == 0) {
-					m_breakout.getBall().setDirection(-1, 1);
-					m_breakout.getBall().setSpeed(10);
-					m_breakout.setGameState(Breakout.GameState.GAME_STARTED);
+				} else if (m_breakout.getBallList().size() == 1) {
+					if (m_breakout.getBallList().getBall().getSpeed() == 0) {
+						m_breakout.getBallList().getBall().setDirection(-1, 1);
+						m_breakout.getBallList().getBall().setSpeed(10);
+						m_breakout.setGameState(Breakout.GameState.GAME_STARTED);
+					}
 				}
 			}
 			if (e.getKeyCode() == KeyEvent.VK_SPACE) {
