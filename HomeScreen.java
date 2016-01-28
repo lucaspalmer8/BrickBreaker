@@ -24,12 +24,13 @@ public class HomeScreen extends JComponent {
 	g2.setColor(Color.BLACK);
 	g2.drawLine(0, getHeight()/2, getWidth(), getHeight()/2);
 		g2.setColor(Color.WHITE);
-		g2.drawString("Hello\nHello\n", 50, 20);
-		g2.drawString("Breakout", 50, 50);
-		g2.drawString("Press Enter to start the game!", 50, 100);
-		g2.drawString("Instructions:", 50, 120);
-		g2.drawString("Press the left/right arrow keys to move the paddle.", 50, 140);
-		g2.drawString("Press the Space Bar to pause the game.", 50, 160);
-		g2.drawString("Press Enter to start the ball moving.", 50, 180);
+		g2.setFont(new Font("Arial", Font.BOLD, 20));
+		g2.drawString("Lucas Palmer 20534173", 50, 20);
+		g2.drawString("Breakout", 50, 60);
+		g2.drawString("Press Enter to start the game!", 50, 120);
+		g2.drawString("Instructions:", 50, 150);
+		g2.drawString("Press the left/right arrow keys to move the paddle.", 50, 180);
+		g2.drawString("Press the Space Bar to pause the game.", 50, 210);
+		g2.drawString("Press Enter to start the ball moving.", 50, 240);
 	}
 }

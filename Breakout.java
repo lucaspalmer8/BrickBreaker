@@ -95,6 +95,14 @@ public class Breakout extends JComponent {
 		public void run() {
 			while(true) {
 				repaint();
+				if (m_brickList.isEmpty()) {
+					m_ball.setSpeed(0);
+					LIVES = 3;
+				LEVEL++;
+					SCORE+= 1000*LEVEL;
+				m_gameState = GameState.GAME_STOPPED;
+				m_brickList = new BrickList();
+				}
 				if (getWidth() != 0 && PREVIOUS_WIDTH != getWidth()) {
 //					System.out.println("AHhhhhhhhhhHH");
 					m_paddle.setX(m_paddle.getFloatX()*getWidth()/PREVIOUS_WIDTH);
@@ -107,10 +115,10 @@ public class Breakout extends JComponent {
 					m_ball.setY(m_ball.getFloatY()*getHeight()/PREVIOUS_HEIGHT);
 					PREVIOUS_HEIGHT = getHeight();
 				}
-				System.out.println(m_gameState);
+				//System.out.println(m_gameState);
 				if (m_gameState == GameState.GAME_OVER || m_gameState == GameState.GAME_PAUSED) {
 					try {
-						System.out.println("Sleeeping nowwwwwww");
+						//System.out.println("Sleeeping nowwwwwww");
 						Thread.sleep(1000/FRAME_RATE);
 					} catch(InterruptedException ex) {
 						Thread.currentThread().interrupt();
@@ -122,10 +130,10 @@ public class Breakout extends JComponent {
 					float s = SPEED;
 					float f = FRAME_RATE;
 					float d = s/f;
-					System.out.println(":::::::::::" + d);
+					//System.out.println(":::::::::::" + d);
 					float leftover = d - (int)d;
 					//float leftover = SPEED/FRAME_RATE - distance;
-					System.out.println("::::::::::::::::::::::::::::" + leftover);
+					//System.out.println("::::::::::::::::::::::::::::" + leftover);
 					for (int i = 0; i < distance; i++) {
 						if (m_ball.getDirection().getX() > 0) {
 							m_ball.incrementX(1);
@@ -146,66 +154,66 @@ public class Breakout extends JComponent {
 						int totalX = m_ball.getX();
 						int totalY = m_ball.getY();
 						if (totalX <= RADIUS) {
-    	                    m_ball.posateX();
-	                    }
-        	            if (totalX >= getWidth() - RADIUS) {
-            	            m_ball.negateX();
-                	    }
-                    	if (totalY <= RADIUS) {
-                        	m_ball.posateY();
-                    	}
+			    m_ball.posateX();
+			    }
+			    if (totalX >= getWidth() - RADIUS) {
+			    m_ball.negateX();
+			    }
+			if (totalY <= RADIUS) {
+				m_ball.posateY();
+			}
 
 						if (totalY >= getHeight() + RADIUS) {
-	                        m_ball.setSpeed(0);
-    	                    LIVES--;
+				m_ball.setSpeed(0);
+			    LIVES--;
 							if (LIVES == 0) {
 								m_gameState = GameState.GAME_OVER;
 							} else {
-        	                	m_gameState = GameState.GAME_STOPPED;
+					m_gameState = GameState.GAME_STOPPED;
 							}
 							break;
-            	        }
+			}
 					}
 
 					hasItHitAnyBricks();
-                        hasItHitThePaddle();
+			hasItHitThePaddle();
 
-                        int RADIUS = m_ball.getRadius();
-                        int totalX = m_ball.getX();
-                        int totalY = m_ball.getY();
-                        if (totalX <= RADIUS) {
-                            m_ball.posateX();
-                        }
-                        if (totalX >= getWidth() - RADIUS) {
-                            m_ball.negateX();
-                        }
-                        if (totalY <= RADIUS) {
-                            m_ball.posateY();
-                        }
+			int RADIUS = m_ball.getRadius();
+			int totalX = m_ball.getX();
+			int totalY = m_ball.getY();
+			if (totalX <= RADIUS) {
+			    m_ball.posateX();
+			}
+			if (totalX >= getWidth() - RADIUS) {
+			    m_ball.negateX();
+			}
+			if (totalY <= RADIUS) {
+			    m_ball.posateY();
+			}
 
-                        if (totalY >= getHeight() + RADIUS) {
-                            m_ball.setSpeed(0);
-                            LIVES--;
-                            if (LIVES == 0) {
-                                m_gameState = GameState.GAME_OVER;
-                            } else {
-                                m_gameState = GameState.GAME_STOPPED;
-                            }
-                        }
+			if (m_ball.getSpeed() > 0 && totalY >= getHeight() + RADIUS) {
+			    m_ball.setSpeed(0);
+			    LIVES--;
+			    if (LIVES == 0) {
+				m_gameState = GameState.GAME_OVER;
+			    } else {
+				m_gameState = GameState.GAME_STOPPED;
+			    }
+			}
 					
 
 					if (m_ball.getDirection().getX() > 0) {
-                        m_ball.incrementX(leftover);
-                    }
-                    if (m_ball.getDirection().getX() < 0) {
-                        m_ball.incrementX(-1*leftover);
-                    }
-                    if (m_ball.getDirection().getY() > 0) {
-                        m_ball.incrementY(leftover);
-                    }
-                    if (m_ball.getDirection().getY() < 0) {
-                        m_ball.incrementY(-1*leftover);
-                    }
+			m_ball.incrementX(leftover);
+		    }
+		    if (m_ball.getDirection().getX() < 0) {
+			m_ball.incrementX(-1*leftover);
+		    }
+		    if (m_ball.getDirection().getY() > 0) {
+			m_ball.incrementY(leftover);
+		    }
+		    if (m_ball.getDirection().getY() < 0) {
+			m_ball.incrementY(-1*leftover);
+		    }
 				}
 
 				if (m_paddle.getDirection() != 0) {
@@ -600,6 +608,15 @@ public class Breakout extends JComponent {
 					m_brickList.add(new Brick(startingX + i*BRICK_WIDTH, startingY + j*BRICK_HEIGHT, colorList.get(j)));
 				}
 			}
+		}
+
+		public boolean isEmpty() {
+			for (Brick brick : m_brickList) {
+		if (brick != null) {
+		    return false;
+		}
+	    }
+	    return true;
 		}
 
 		public int size() {
