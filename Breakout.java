@@ -16,11 +16,16 @@ import java.lang.Math;
 public class Breakout extends JComponent {
 
 	private static int SCORE = 0;
-	private static int LEVEL = 0;
+	private static int LEVEL = 1;
 	private static int LIVES = 3;
 
 	private static int BRICK_SCORE = 300;
 	
+	private static int FRAME_RATE = 40;
+	private static int SPEED = 200;
+
+	private static int PADDLE_SPEED = 400;
+
 	private static final int BRICK_HEIGHT = 20;
 	private static final int BRICK_WIDTH = 50;
 	private static final int BRICK_GAP = 2;
@@ -31,6 +36,9 @@ public class Breakout extends JComponent {
 
 	public static final int X = 1000;
 	public static final int Y = 500;
+
+	public static int PREVIOUS_WIDTH = 1000;
+	public static int PREVIOUS_HEIGHT = 500;
 
 	private GameState m_gameState = GameState.GAME_STOPPED;
 
@@ -48,6 +56,11 @@ public class Breakout extends JComponent {
 	public void setGameState(GameState gameState) {
 		m_gameState = gameState;
 	}
+	
+	public void setRates(int frameRate, int speed) {
+		FRAME_RATE = frameRate;
+		SPEED = speed; 
+	}
 
 	public void pauseResume() {
 		if (m_gameState == GameState.GAME_PAUSED) {
@@ -59,7 +72,7 @@ public class Breakout extends JComponent {
 
 	public void startNewGame() {
 		LIVES = 3;
-		LEVEL = 0;
+		LEVEL = 1;
 		SCORE = 0;
 		m_gameState = GameState.GAME_STOPPED;
 		m_brickList = new BrickList();
@@ -68,6 +81,10 @@ public class Breakout extends JComponent {
 	public Breakout() {
 		new Thread(new FrameDrawer()).start();
 	}
+
+//	public void startThread() {
+//		new Thread(new FrameDrawer()).start();
+//	}
 
 	public interface DrawableObject {
 		void draw(Graphics2D g2);
@@ -78,101 +95,132 @@ public class Breakout extends JComponent {
 		public void run() {
 			while(true) {
 				repaint();
+				if (getWidth() != 0 && PREVIOUS_WIDTH != getWidth()) {
+//					System.out.println("AHhhhhhhhhhHH");
+					m_paddle.setX(m_paddle.getFloatX()*getWidth()/PREVIOUS_WIDTH);
+					m_ball.setX(m_ball.getFloatX()*getWidth()/PREVIOUS_WIDTH);
+					PREVIOUS_WIDTH = getWidth();
+				}
+				if (getHeight() != 0 && PREVIOUS_HEIGHT != getHeight()) {
+//					System.out.println("NoooooooooOO");
+					//m_paddle.setY(m_paddle.getY()*getHeight()/PREVIOUS_HEIGHT);
+					m_ball.setY(m_ball.getFloatY()*getHeight()/PREVIOUS_HEIGHT);
+					PREVIOUS_HEIGHT = getHeight();
+				}
+				System.out.println(m_gameState);
 				if (m_gameState == GameState.GAME_OVER || m_gameState == GameState.GAME_PAUSED) {
 					try {
-						Thread.sleep(1000/40);
+						System.out.println("Sleeeping nowwwwwww");
+						Thread.sleep(1000/FRAME_RATE);
 					} catch(InterruptedException ex) {
 						Thread.currentThread().interrupt();
 					}
 					continue;
 				}
 				if (m_ball.getSpeed() > 0) {
-					int x = 0;
-					int y = 0;
-					if (m_ball.getDirection().getX() > 0) {
+					int distance = SPEED/FRAME_RATE;
+					float s = SPEED;
+					float f = FRAME_RATE;
+					float d = s/f;
+					System.out.println(":::::::::::" + d);
+					float leftover = d - (int)d;
+					//float leftover = SPEED/FRAME_RATE - distance;
+					System.out.println("::::::::::::::::::::::::::::" + leftover);
+					for (int i = 0; i < distance; i++) {
+						if (m_ball.getDirection().getX() > 0) {
+							m_ball.incrementX(1);
+						}
+						if (m_ball.getDirection().getX() < 0) {
+							m_ball.incrementX(-1);
+						}
 						if (m_ball.getDirection().getY() > 0) {
-							for (int i = 0; i < 5; i++) {
-								if (m_brickList.isPointInBricks(x + 1, y + 1) || m_paddle.isPointInPaddle(x + 1, y + 1)) {
-									break;
-								}
-								x++;
-								y++;
-							}
-						} else {
-							for (int i = 0; i < 5; i++) {
-								if (m_brickList.isPointInBricks(x + 1, y - 1) || m_paddle.isPointInPaddle(x + 1, y - 1)) {
-									break;
-								}
-								x++;
-								y--;
-							}
+							m_ball.incrementY(1);
 						}
-					} else {
-						if (m_ball.getDirection().getY() > 0) {
-							for (int i = 0; i < 5; i++) {
-								if (m_brickList.isPointInBricks(x - 1, y + 1) || m_paddle.isPointInPaddle(x - 1, y + 1)) {
-									break;
-								}
-								x--;
-								y++;
-							}
-						} else {
-							for (int i = 0; i < 5; i++) {
-								if (m_brickList.isPointInBricks(x - 1, y - 1) || m_paddle.isPointInPaddle(x - 1, y - 1)) {
-									break;
-								}
-								x--;
-								y--;
-							}
+						if (m_ball.getDirection().getY() < 0) {
+							m_ball.incrementY(-1);
 						}
-					}					 
+						hasItHitAnyBricks();
+						hasItHitThePaddle();
 
-					int totalX = x + m_ball.getX();
-					int totalY = y + m_ball.getY();
-					int RADIUS = m_ball.getRadius();
+						int RADIUS = m_ball.getRadius();
+						int totalX = m_ball.getX();
+						int totalY = m_ball.getY();
+						if (totalX <= RADIUS) {
+    	                    m_ball.posateX();
+	                    }
+        	            if (totalX >= getWidth() - RADIUS) {
+            	            m_ball.negateX();
+                	    }
+                    	if (totalY <= RADIUS) {
+                        	m_ball.posateY();
+                    	}
 
-					if (totalX <= RADIUS) {
-						m_ball.posateX();
-					}
-					if (totalX >= getWidth() - RADIUS) {
-						m_ball.negateX();
-					}
-					if (totalY <= RADIUS) {
-						m_ball.posateY();
-					}
-					//if (totalY >= getHeight() - 
-
-
-/*
-					|| totalX >= getWidth() - RADIUS) {
-						if (totalY <= RADIUS) {
-							m_ball.reflectXY();
-						} else {
-							m_ball.reflectX();
-						}
-					} else if (totalY <= RADIUS) {
-						m_ball.reflectY();
-	*/
-					
-					if (totalY >= getHeight() + RADIUS) {
-						m_ball.setSpeed(0);
-						LIVES--;
-						m_gameState = GameState.GAME_STOPPED;
+						if (totalY >= getHeight() + RADIUS) {
+	                        m_ball.setSpeed(0);
+    	                    LIVES--;
+							if (LIVES == 0) {
+								m_gameState = GameState.GAME_OVER;
+							} else {
+        	                	m_gameState = GameState.GAME_STOPPED;
+							}
+							break;
+            	        }
 					}
 
-					if (LIVES == 0) {
-						m_gameState = GameState.GAME_OVER;
-					}
-
-					m_ball.incrementX(x);
-					m_ball.incrementY(y);
-				
 					hasItHitAnyBricks();
-					hasItHitThePaddle();
+                        hasItHitThePaddle();
+
+                        int RADIUS = m_ball.getRadius();
+                        int totalX = m_ball.getX();
+                        int totalY = m_ball.getY();
+                        if (totalX <= RADIUS) {
+                            m_ball.posateX();
+                        }
+                        if (totalX >= getWidth() - RADIUS) {
+                            m_ball.negateX();
+                        }
+                        if (totalY <= RADIUS) {
+                            m_ball.posateY();
+                        }
+
+                        if (totalY >= getHeight() + RADIUS) {
+                            m_ball.setSpeed(0);
+                            LIVES--;
+                            if (LIVES == 0) {
+                                m_gameState = GameState.GAME_OVER;
+                            } else {
+                                m_gameState = GameState.GAME_STOPPED;
+                            }
+                        }
+					
+
+					if (m_ball.getDirection().getX() > 0) {
+                        m_ball.incrementX(leftover);
+                    }
+                    if (m_ball.getDirection().getX() < 0) {
+                        m_ball.incrementX(-1*leftover);
+                    }
+                    if (m_ball.getDirection().getY() > 0) {
+                        m_ball.incrementY(leftover);
+                    }
+                    if (m_ball.getDirection().getY() < 0) {
+                        m_ball.incrementY(-1*leftover);
+                    }
 				}
 
 				if (m_paddle.getDirection() != 0) {
-					m_paddle.incrementX(m_paddle.getDirection()*10);
+					int distance = PADDLE_SPEED/FRAME_RATE;
+
+					for (int i = 0; i < distance; i++) {
+						if (m_paddle.getDirection() > 0) {
+							m_paddle.incrementX(1);
+						}
+						if (m_paddle.getDirection() < 0) {
+							m_paddle.incrementX(-1);
+						}
+					}
+
+					//m_paddle.incrementX(m_paddle.getDirection()*10);
 					if (m_paddle.getX1() < 0) {
 						m_paddle.incrementX(-m_paddle.getX1());
 					}
@@ -182,7 +230,7 @@ public class Breakout extends JComponent {
 				}
 
 				try {
-					Thread.sleep(1000/40);			   
+					Thread.sleep(1000/FRAME_RATE);			   
 				} catch(InterruptedException ex) {
 					Thread.currentThread().interrupt();
 				}
@@ -230,24 +278,48 @@ public class Breakout extends JComponent {
 		}
 
 		public int getX() {
-			return (int)m_x*getWidth()/X;
+			return (int)m_x;
 		}
 
 		public int getY() {
-			return (int)m_y*getHeight()/Y;
+			return (int)m_y;
+		}
+
+		public float getFloatX() {
+			return m_x;
+		}
+	
+		public float getFloatY() {
+			return m_y;
+		}
+
+		public void setX(float x) {
+			m_x = x;
+		}
+
+		public void setY(float y) {
+			m_y = y;
 		}
 
 		public void incrementX(int x) {
-			m_x += x*X/getWidth();
+			m_x += x;
 		}
 
 		public void incrementY(int y) {
-			m_y += y*Y/getHeight();
+			m_y += y;
+		}
+
+		public void incrementX(float x) {
+			m_x += x;
+		}
+	
+		public void incrementY(float y) {
+			m_y += y;
 		}
 
 		public void initializePosition() {
-			m_x = X - 20;
-			m_y = Y - 200;
+			m_x = getWidth() - 20;
+			m_y = getHeight() - 200;
 		}
 	
 		public void setSpeed(int speed) {
@@ -301,7 +373,7 @@ public class Breakout extends JComponent {
 		}
 
 		public void reflectY() {
-			m_direction.setY(-1 * m_direction.getY());
+			m_direction.set-1 * m_direction.getY());
 			SCORE += 50;
 		}
 
@@ -312,7 +384,8 @@ public class Breakout extends JComponent {
 		}*/
 
 		public int getRadius() {
-			int rad1 = BALL_RADIUS*getWidth()/X;
+			return MINIMUM_RADIUS;
+			/*int rad1 = BALL_RADIUS*getWidth()/X;
 			int rad2 = BALL_RADIUS*getHeight()/Y;
 			if (rad1 < MINIMUM_RADIUS || rad2 < MINIMUM_RADIUS) {
 				return MINIMUM_RADIUS;
@@ -321,7 +394,7 @@ public class Breakout extends JComponent {
 				return rad1;
 			} else {
 				return rad2;
-			}
+			}*/
 		}
 
 		@Override
@@ -354,16 +427,28 @@ public class Breakout extends JComponent {
 			m_direction = dir;
 		}
 
+		public void setX(float x) {
+			m_xPos = x;
+		}
+
 		public int getDirection() {
 			return m_direction;
 		}
 
 		public int getX() {
-			return (int)m_xPos*getWidth()/X;
+			return (int)m_xPos;
 		}
 
+		public float getFloatX() {
+			return m_xPos;
+		}
+
+		//public float getX() {
+		//	return m_xPos;
+		//}
+
 		public void incrementX(int x) {
-			m_xPos += x*X/getWidth();
+			m_xPos += x;
 		}
 
 		public int getX1() {
