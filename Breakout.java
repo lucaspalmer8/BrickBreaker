@@ -82,10 +82,6 @@ public class Breakout extends JComponent {
 		new Thread(new FrameDrawer()).start();
 	}
 
-//	public void startThread() {
-//		new Thread(new FrameDrawer()).start();
-//	}
-
 	public interface DrawableObject {
 		void draw(Graphics2D g2);
 	}
@@ -104,7 +100,6 @@ public class Breakout extends JComponent {
 					m_brickList = new BrickList();
 				}
 				if (getWidth() != 0 && PREVIOUS_WIDTH != getWidth()) {
-//					System.out.println("AHhhhhhhhhhHH");
 					m_paddle.setX(m_paddle.getFloatX()*getWidth()/PREVIOUS_WIDTH);
 					for (Ball m_ball : m_ballList.getList()) {
 						if (m_ball != null) {
@@ -114,8 +109,6 @@ public class Breakout extends JComponent {
 					PREVIOUS_WIDTH = getWidth();
 				}
 				if (getHeight() != 0 && PREVIOUS_HEIGHT != getHeight()) {
-//					System.out.println("NoooooooooOO");
-					//m_paddle.setY(m_paddle.getY()*getHeight()/PREVIOUS_HEIGHT);
 					for (Ball m_ball : m_ballList.getList()) {
 						if (m_ball != null) {
 							m_ball.setY(m_ball.getFloatY()*getHeight()/PREVIOUS_HEIGHT);
@@ -123,42 +116,75 @@ public class Breakout extends JComponent {
 					}
 					PREVIOUS_HEIGHT = getHeight();
 				}
-				//System.out.println(m_gameState);
 				if (m_gameState == GameState.GAME_OVER || m_gameState == GameState.GAME_PAUSED) {
 					try {
-						//System.out.println("Sleeeping nowwwwwww");
 						Thread.sleep(1000/FRAME_RATE);
 					} catch(InterruptedException ex) {
 						Thread.currentThread().interrupt();
 					}
 					continue;
 				}
-			for (int i = 0; i < m_ballList.getList().size(); i++) {
-				Ball m_ball = m_ballList.getList().get(i);
-				if (m_ball == null) continue;
-				boolean removedBall = false;
-				if (m_ball.getSpeed() > 0) {
-					int distance = SPEED/FRAME_RATE;
-					float s = SPEED;
-					float f = FRAME_RATE;
-					float d = s/f;
-					//System.out.println(":::::::::::" + d);
-					float leftover = d - (int)d;
-					//float leftover = SPEED/FRAME_RATE - distance;
-					//System.out.println("::::::::::::::::::::::::::::" + leftover);
-					for (int j = 0; j < distance; j++) {
-						if (m_ball.getDirection().getX() > 0) {
-							m_ball.incrementX(1);
+				for (int i = 0; i < m_ballList.getList().size(); i++) {
+					Ball m_ball = m_ballList.getList().get(i);
+					if (m_ball == null) continue;
+					boolean removedBall = false;
+					if (m_ball.getSpeed() > 0) {
+						int distance = SPEED/FRAME_RATE;
+						float s = SPEED;
+						float f = FRAME_RATE;
+						float d = s/f;
+						float leftover = d - (int)d;
+						for (int j = 0; j < distance; j++) {
+							if (m_ball.getDirection().getX() > 0) {
+								m_ball.incrementX(1);
+							}
+							if (m_ball.getDirection().getX() < 0) {
+								m_ball.incrementX(-1);
+							}
+							if (m_ball.getDirection().getY() > 0) {
+								m_ball.incrementY(1);
+							}
+							if (m_ball.getDirection().getY() < 0) {
+								m_ball.incrementY(-1);
+							}
+							hasItHitAnyBricks(m_ball);
+							hasItHitThePaddle(m_ball);
+
+							int RADIUS = m_ball.getRadius();
+							int totalX = m_ball.getX();
+							int totalY = m_ball.getY();
+							if (totalX <= RADIUS) {
+								m_ball.posateX();
+							}
+							if (totalX >= getWidth() - RADIUS) {
+								m_ball.negateX();
+							}
+							if (totalY <= RADIUS) {
+								m_ball.posateY();
+							}
+
+							if (totalY >= getHeight() + RADIUS) {
+								int numBalls = m_ballList.size();
+								if (numBalls > 1) {
+									m_ballList.getList().set(i, null);
+									removedBall = true;
+									break;
+								} else if (numBalls == 1) {
+									m_ball.setSpeed(0);
+									LIVES--;
+									if (LIVES == 0) {
+										m_gameState = GameState.GAME_OVER;
+										m_ballList = new BallList();
+									} else {
+										m_gameState = GameState.GAME_STOPPED;
+									}
+									break;
+								}
+							}
 						}
-						if (m_ball.getDirection().getX() < 0) {
-							m_ball.incrementX(-1);
-						}
-						if (m_ball.getDirection().getY() > 0) {
-							m_ball.incrementY(1);
-						}
-						if (m_ball.getDirection().getY() < 0) {
-							m_ball.incrementY(-1);
-						}
+
+						if (removedBall) continue;
+
 						hasItHitAnyBricks(m_ball);
 						hasItHitThePaddle(m_ball);
 
@@ -175,57 +201,8 @@ public class Breakout extends JComponent {
 							m_ball.posateY();
 						}
 
-						if (totalY >= getHeight() + RADIUS) {
-							int numBalls = m_ballList.size();
-							//System.out.println("The size firsts isss:::: " + numBalls);
-							if (numBalls > 1) {
-								m_ballList.getList().set(i, null);
-								removedBall = true;
-								break;
-							} else if (numBalls == 1) {
-								m_ball.setSpeed(0);
-								LIVES--;
-								if (LIVES == 0) {
-									m_gameState = GameState.GAME_OVER;
-									m_ballList = new BallList();
-								} else {
-									m_gameState = GameState.GAME_STOPPED;
-								}
-								break;
-							}
-						}
-					}
-
-					if (removedBall) continue;
-
-					hasItHitAnyBricks(m_ball);
-						hasItHitThePaddle(m_ball);
-
-						int RADIUS = m_ball.getRadius();
-						int totalX = m_ball.getX();
-						int totalY = m_ball.getY();
-						if (totalX <= RADIUS) {
-							m_ball.posateX();
-						}
-						if (totalX >= getWidth() - RADIUS) {
-							m_ball.negateX();
-						}
-						if (totalY <= RADIUS) {
-							m_ball.posateY();
-						}
-
-						/*if (m_ball.getSpeed() > 0 && totalY >= getHeight() + RADIUS) {
-							m_ball.setSpeed(0);
-							LIVES--;
-							if (LIVES == 0) {
-								m_gameState = GameState.GAME_OVER;
-							} else {
-								m_gameState = GameState.GAME_STOPPED;
-							}
-						}*/
 						if (m_ball.getSpeed() > 0 && totalY >= getHeight() + RADIUS) {
 							int numBalls = m_ballList.size();
-							//System.out.println("The size iss::::::: " + numBalls);
 							if (numBalls > 1) {
 								m_ballList.getList().set(i, null);
 								continue;
@@ -239,24 +216,22 @@ public class Breakout extends JComponent {
 								}
 								break;
 							}
+						}						
+
+						if (m_ball.getDirection().getX() > 0) {
+							m_ball.incrementX(leftover);
 						}
-
-					
-
-					if (m_ball.getDirection().getX() > 0) {
-						m_ball.incrementX(leftover);
-					}
-					if (m_ball.getDirection().getX() < 0) {
-						m_ball.incrementX(-1*leftover);
-					}
-					if (m_ball.getDirection().getY() > 0) {
-						m_ball.incrementY(leftover);
-					}
-					if (m_ball.getDirection().getY() < 0) {
-						m_ball.incrementY(-1*leftover);
+						if (m_ball.getDirection().getX() < 0) {
+							m_ball.incrementX(-1*leftover);
+						}
+						if (m_ball.getDirection().getY() > 0) {
+							m_ball.incrementY(leftover);
+						}
+						if (m_ball.getDirection().getY() < 0) {
+							m_ball.incrementY(-1*leftover);
+						}
 					}
 				}
-			}
 
 				if (m_paddle.getDirection() != 0) {
 					int distance = PADDLE_SPEED/FRAME_RATE;
@@ -270,7 +245,6 @@ public class Breakout extends JComponent {
 						}
 					}
 
-					//m_paddle.incrementX(m_paddle.getDirection()*10);
 					if (m_paddle.getX1() < 0) {
 						m_paddle.incrementX(-m_paddle.getX1());
 					}
@@ -397,16 +371,16 @@ public class Breakout extends JComponent {
 
 		public void posateX() {
 			if (m_direction.getX() < 0) {
-		m_direction.setX(-1*m_direction.getX());
-		SCORE += 50;
-		}
+				m_direction.setX(-1*m_direction.getX());
+				SCORE += 50;
+			}
 		}
 
 		public void posateY() {
 			if (m_direction.getY() < 0) {
-		m_direction.setY(-1*m_direction.getY());
-		SCORE += 50;
-		}
+				m_direction.setY(-1*m_direction.getY());
+				SCORE += 50;
+			}
 		}
 
 		public void negateX() {
@@ -418,39 +392,13 @@ public class Breakout extends JComponent {
 
 		public void negateY() {
 			if (m_direction.getY() > 0) {
-		m_direction.setY(-1*m_direction.getY());
-		SCORE += 50;
+				m_direction.setY(-1*m_direction.getY());
+				SCORE += 50;
+			}
 		}
-		}
-
-		/*public void reflectX() {
-			m_direction.setX(-1 * m_direction.getX());
-			SCORE += 50;
-		}
-
-		public void reflectY() {
-			m_direction.set-1 * m_direction.getY());
-			SCORE += 50;
-		}
-
-		public void reflectXY() {
-			m_direction.setX(-1 * m_direction.getX());
-			m_direction.setY(-1 * m_direction.getY());
-			SCORE += 50;
-		}*/
 
 		public int getRadius() {
 			return MINIMUM_RADIUS;
-			/*int rad1 = BALL_RADIUS*getWidth()/X;
-			int rad2 = BALL_RADIUS*getHeight()/Y;
-			if (rad1 < MINIMUM_RADIUS || rad2 < MINIMUM_RADIUS) {
-				return MINIMUM_RADIUS;
-			}
-			if (rad1 < rad2) {
-				return rad1;
-			} else {
-				return rad2;
-			}*/
 		}
 
 		@Override
@@ -458,17 +406,10 @@ public class Breakout extends JComponent {
 			if (m_speed == 0) {
 				initializePosition();
 			}
-
 			g2.setColor(Color.RED);
 			g2.fillOval(getX() - getRadius(), getY() - getRadius(), getRadius() * 2, getRadius() * 2);
 		}
 	}
-
-	//private Ball m_ball = new Ball();
-
-	//public Ball getBall() {
-	//	return m_ball;
-	//}
 
 	public class BallList implements DrawableObject {
 		private ArrayList<Ball> m_ballyList = new ArrayList<Ball>();
@@ -498,10 +439,7 @@ public class Breakout extends JComponent {
 			int counter = 0;
 			for (Ball ball : m_ballyList) {
 				if (ball != null) {
-					//System.out.println("Nott nullllll");
 					counter++;
-				} else {
-					//System.out.println("NUllllllllllllllll");
 				}
 			}
 			return counter;
@@ -564,10 +502,6 @@ public class Breakout extends JComponent {
 		public float getFloatX() {
 			return m_xPos;
 		}
-
-		//public float getX() {
-		//	return m_xPos;
-		//}
 
 		public void incrementX(int x) {
 			m_xPos += x;
@@ -709,19 +643,19 @@ public class Breakout extends JComponent {
 		@Override
 		public void draw(Graphics2D g2) {
 			g2.setColor(m_color);
-		g2.fill(new Rectangle2D.Double(getX(), getY(), BRICK_WIDTH*getWidth()/X - BRICK_GAP, BRICK_HEIGHT*getHeight()/Y - BRICK_GAP));
-		if (m_newBall) {
-			g2.setColor(Color.BLACK);
-			float centreX = getX() + (BRICK_WIDTH*getWidth()/X - BRICK_GAP)/2;
-			float centreY = getY() + (BRICK_HEIGHT*getHeight()/Y - BRICK_GAP)/2;
-			float radius1 = (BRICK_HEIGHT*getHeight()/Y - BRICK_GAP)/3;
-			float radius2 = (BRICK_WIDTH*getWidth()/X - BRICK_GAP)/3;
-			float radius = radius1;
-			if (radius2 < radius1) {
-				radius = radius2;
+			g2.fill(new Rectangle2D.Double(getX(), getY(), BRICK_WIDTH*getWidth()/X - BRICK_GAP, BRICK_HEIGHT*getHeight()/Y - BRICK_GAP));
+			if (m_newBall) {
+				g2.setColor(Color.BLACK);
+				float centreX = getX() + (BRICK_WIDTH*getWidth()/X - BRICK_GAP)/2;
+				float centreY = getY() + (BRICK_HEIGHT*getHeight()/Y - BRICK_GAP)/2;
+				float radius1 = (BRICK_HEIGHT*getHeight()/Y - BRICK_GAP)/3;
+				float radius2 = (BRICK_WIDTH*getWidth()/X - BRICK_GAP)/3;
+				float radius = radius1;
+				if (radius2 < radius1) {
+					radius = radius2;
+				}
+				g2.fillOval((int)(centreX - radius), (int)(centreY - radius), (int)(radius * 2), (int)(radius * 2));
 			}
-			g2.fillOval((int)(centreX - radius), (int)(centreY - radius), (int)(radius * 2), (int)(radius * 2));
-		}
 		}
 	}
 
@@ -854,13 +788,13 @@ public class Breakout extends JComponent {
 				continue;
 			}
 
-		int ballX = m_ball.getX();
-		int ballY = m_ball.getY();
+			int ballX = m_ball.getX();
+			int ballY = m_ball.getY();
 
-		int brickX1 = (int)brick.getX1();
-		int brickX2 = (int)brick.getX2();
-		int brickY1 = (int)brick.getY1();
-		int brickY2 = (int)brick.getY2();
+			int brickX1 = (int)brick.getX1();
+			int brickX2 = (int)brick.getX2();
+			int brickY1 = (int)brick.getY1();
+			int brickY2 = (int)brick.getY2();
 
 			int RADIUS = m_ball.getRadius();
 
@@ -878,7 +812,7 @@ public class Breakout extends JComponent {
 						m_ball.negateY();
 					}
 					m_brickList.remove(i);
-			break;
+					break;
 				}
 			} else if (ballX > brickX2 && ballY < brickY1) {//top right corner
 				int distanceSquared = (ballX - brickX2)*(ballX - brickX2) + (ballY - brickY1)*(ballY - brickY1);
@@ -886,41 +820,41 @@ public class Breakout extends JComponent {
 					if (direction.getX() < 0 && direction.getY() > 0) {
 						m_ball.posateX();
 						m_ball.negateY();
-			} else if (direction.getX() > 0 && direction.getY() > 0) {
+					} else if (direction.getX() > 0 && direction.getY() > 0) {
 						m_ball.negateY();
 					} else if (direction.getX() < 0 && direction.getY() < 0) {
 						m_ball.posateX();
 					}
 					m_brickList.remove(i);
-			break;
+					break;
 				}
 			} else if (ballX < brickX1 && ballY > brickY2) {//bottom left corner
 				int distanceSquared = (ballX - brickX1)*(ballX - brickX1) + (ballY - brickY2)*(ballY - brickY2);
 				if (distanceSquared <= RADIUS*RADIUS) {
 					if (direction.getX() > 0 && direction.getY() < 0) {
-			m_ball.negateX();
+						m_ball.negateX();
 						m_ball.posateY();
-			} else if (direction.getX() < 0 && direction.getY() < 0) {
+					} else if (direction.getX() < 0 && direction.getY() < 0) {
 						m_ball.posateY();
 					} else if (direction.getX() > 0 && direction.getY() > 0) {
 						m_ball.negateX();
 					}
 					m_brickList.remove(i);
-			break;
+					break;
 				}
 			} else if (ballX > brickX2 && ballY > brickY2) {//bottom right corner
 				int distanceSquared = (ballX - brickX2)*(ballX - brickX2) + (ballY - brickY2)*(ballY - brickY2);
 				if (distanceSquared <= RADIUS*RADIUS) {
 					if (direction.getX() < 0 && direction.getY() < 0) {
-			m_ball.posateX();
+						m_ball.posateX();
 						m_ball.posateY();
-			} else if (direction.getX() > 0 && direction.getY() < 0) {
+					} else if (direction.getX() > 0 && direction.getY() < 0) {
 						m_ball.posateY();
 					} else if (direction.getX() < 0 && direction.getY() > 0) {
 						m_ball.posateX();
 					}
 					m_brickList.remove(i);
-			break;
+					break;
 				}
 			}	
 		}
@@ -955,49 +889,30 @@ public class Breakout extends JComponent {
 			}
 		} else {
 			if (ballX < x1 && ballY < y1) {//top left corner
-		int distanceSquared = (ballX - x1)*(ballX - x1) + (ballY - y1)*(ballY - y1);
-		if (distanceSquared <= RADIUS*RADIUS) {
-			if (direction.getX() > 0 && direction.getY() > 0) {
-			m_ball.negateX();
-			m_ball.negateY();
-			} else if (direction.getX() > 0 && direction.getY() < 0) {
-			m_ball.negateX();
-			} else if (direction.getX() < 0 && direction.getY() > 0) {
-			m_ball.negateY();
-			}
-		}
-		} else if (ballX > x2 && ballY < y1) {//top right corner
-		int distanceSquared = (ballX - x2)*(ballX - x2) + (ballY - y1)*(ballY - y1);
-		if (distanceSquared <= RADIUS*RADIUS) {
-			if (direction.getX() < 0 && direction.getY() > 0) {
-			m_ball.posateX();
-			m_ball.negateY();
-			} else if (direction.getX() > 0 && direction.getY() > 0) {
-			m_ball.negateY();
-			} else if (direction.getX() < 0 && direction.getY() < 0) {
-			m_ball.posateX();
-			}
-		}
-		}
-
-/*
-		} else {
-			if (ballX < x1 && ballY < y1) { //top left corner
 				int distanceSquared = (ballX - x1)*(ballX - x1) + (ballY - y1)*(ballY - y1);
-		if (distanceSquared <= RADIUS*RADIUS) {
-			if (direction.getX() > 0 && direction.getY() > 0) {
-			m_ball.negateX();
+				if (distanceSquared <= RADIUS*RADIUS) {
+					if (direction.getX() > 0 && direction.getY() > 0) {
+						m_ball.negateX();
 						m_ball.negateY();
-			}
-		}
-			} else if (ballX > x2 && ballY < y1) { //top right corner
+					} else if (direction.getX() > 0 && direction.getY() < 0) {
+						m_ball.negateX();
+					} else if (direction.getX() < 0 && direction.getY() > 0) {
+						m_ball.negateY();
+					}
+				}
+			} else if (ballX > x2 && ballY < y1) {//top right corner
 				int distanceSquared = (ballX - x2)*(ballX - x2) + (ballY - y1)*(ballY - y1);
-		if (distanceSquared <= RADIUS*RADIUS) {
-			if (direction.getX() < 0 && direction.getY() > 0) {
-			m_ball.reflectXY();
+				if (distanceSquared <= RADIUS*RADIUS) {
+					if (direction.getX() < 0 && direction.getY() > 0) {
+						m_ball.posateX();
+						m_ball.negateY();
+					} else if (direction.getX() > 0 && direction.getY() > 0) {
+						m_ball.negateY();
+					} else if (direction.getX() < 0 && direction.getY() < 0) {
+						m_ball.posateX();
+					}
+				}
 			}
-		} 
-			}*/
 		}
 	}
 
@@ -1028,7 +943,7 @@ public class Breakout extends JComponent {
 			g2.setFont(new Font("Arial", Font.BOLD, 11 + 11*getWidth()/X));
 			g2.setColor(Color.WHITE);
 			String paused = "PAUSED";
-		int width = g2.getFontMetrics().stringWidth(paused);
+			int width = g2.getFontMetrics().stringWidth(paused);
 			g2.drawString(paused, getWidth()/2 - width/2, 2*getHeight()/3);
 			g2.setFont(new Font("Arial", Font.PLAIN, 8 + 8*getWidth()/X));
 			String resume = "Press space bar to resume.";
@@ -1037,12 +952,12 @@ public class Breakout extends JComponent {
 		}
 	
 		if (m_gameState == GameState.GAME_STOPPED) {
-		g2.setFont(new Font("Arial", Font.PLAIN, 8 + 8*getWidth()/X));
+			g2.setFont(new Font("Arial", Font.PLAIN, 8 + 8*getWidth()/X));
 			g2.setColor(Color.WHITE);
-		String play = "Press enter to start ball movement.";
-		int w = g2.getFontMetrics().stringWidth(play);
-		g2.drawString(play, getWidth()/2 - w/2, 2*getHeight()/3);
-	}
+			String play = "Press enter to start ball movement.";
+			int w = g2.getFontMetrics().stringWidth(play);
+			g2.drawString(play, getWidth()/2 - w/2, 2*getHeight()/3);
+		}
 
 		if (m_gameState == GameState.GAME_OVER) {
 			g2.setFont(new Font("Arial", Font.BOLD, 11 + 11*getWidth()/X));
@@ -1051,9 +966,9 @@ public class Breakout extends JComponent {
 			int width = g2.getFontMetrics().stringWidth(over);
 			g2.drawString(over, getWidth()/2 - width/2, 2*getHeight()/3);
 			g2.setFont(new Font("Arial", Font.PLAIN, 8 + 8*getWidth()/X));
-		String start = "Press enter to start new game.";
-		int w = g2.getFontMetrics().stringWidth(start);
-		g2.drawString(start, getWidth()/2 - w/2, 2*getHeight()/3 + 18);
+			String start = "Press enter to start new game.";
+			int w = g2.getFontMetrics().stringWidth(start);
+			g2.drawString(start, getWidth()/2 - w/2, 2*getHeight()/3 + 18);
 		}
 	}
 }

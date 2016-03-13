@@ -38,14 +38,12 @@ public class Game {
 				if (!m_gameStarted) {
 					return;
 				}
-//				System.out.println("Setting the direction to 1");
 				m_breakout.getPaddle().setDirection(1);
 			}
 			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
 				if (!m_gameStarted) {
 					return;
 				}
-//				System.out.println("setting the direction to -1");
 				m_breakout.getPaddle().setDirection(-1);
 			}
 			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -53,7 +51,6 @@ public class Game {
 					m_gameStarted = true;
 					m_frame.setContentPane(m_breakout);
 					m_frame.getContentPane().revalidate();
-//					m_breakout.startThread();
 					return;
 				}
 				if (m_breakout.getGameState() == Breakout.GameState.GAME_OVER) {
@@ -78,20 +75,13 @@ public class Game {
 			if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 				if (m_breakout.getPaddle().getDirection() > 0) {
 					m_breakout.getPaddle().setDirection(0);
-//					System.out.println("Setting the direction to 0");
 				}
 			}
 			if (e.getKeyCode() == KeyEvent.VK_LEFT) {
 				if (m_breakout.getPaddle().getDirection() < 0) {
-//					System.out.println("Setting the direction to 0");
 					m_breakout.getPaddle().setDirection(0);
 				}
 			}
-		}
-
-		@Override
-		public void keyTyped(KeyEvent e) {
-//			System.out.println("Key typed");
 		}
 	}
 }
